@@ -1,20 +1,19 @@
 package com.algaworks.algatransito.domain.model;
 
-import com.algaworks.algatransito.domain.validation.ValidationGroups;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
-import jakarta.validation.groups.ConvertGroup;
-import jakarta.validation.groups.Default;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -28,7 +27,6 @@ public class Veiculo {
     private Long id;
 
     @Valid
-    @ConvertGroup(from = Default.class, to = ValidationGroups.ProprietarioId.class)
     @NonNull
     @ManyToOne
     //@JoinColumn(name = "proprietario_id")
@@ -53,4 +51,7 @@ public class Veiculo {
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private OffsetDateTime dataApreensao;
+
+    @OneToMany(mappedBy = "veiculo")
+    private List<Autuacao> autuacaos = new ArrayList<>();
 }
