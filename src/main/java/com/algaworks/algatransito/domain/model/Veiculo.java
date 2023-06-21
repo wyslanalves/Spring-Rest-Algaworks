@@ -1,5 +1,6 @@
 package com.algaworks.algatransito.domain.model;
 
+import com.algaworks.algatransito.domain.exception.NegocioException;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
@@ -52,7 +53,7 @@ public class Veiculo {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private OffsetDateTime dataApreensao;
 
-    @OneToMany(mappedBy = "veiculo")
+    @OneToMany(mappedBy = "veiculo", cascade = CascadeType.ALL)
     private List<Autuacao> autuacaos = new ArrayList<>();
 
     public Autuacao adicionarAutuacao(Autuacao autuacao){
@@ -61,5 +62,30 @@ public class Veiculo {
         getAutuacaos().add(autuacao);
 
         return autuacao;
+    }
+
+    public void apreender(){
+        if(estaApreendido()){
+            throw new NegocioException("Veiculo já se encontra apreendido");
+        }
+
+        setStatus(StatusVeiculo.APREENDIDO);
+        setDataApreensao(OffsetDateTime.now());
+    }
+
+    public boolean estaApreendido(){
+        return StatusVeiculo.APREENDIDO.equals(getStatus());
+    }
+
+    public void removerApreensao() {
+        if(naoEstaApreendido()){
+            throw  new NegocioException("Veiculo não esta apreendido");
+        }
+        setStatus(StatusVeiculo.REGULAR);
+        setDataApreensao(null);
+    }
+
+    public boolean naoEstaApreendido(){
+        return !estaApreendido();
     }
 }
